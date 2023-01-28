@@ -1,5 +1,5 @@
 # Upload Button for Web Interface
-Simple button that will open a file explorer window on your phone or computer and allow you to upload a file, for the ReMarkable Tablet's Web Interface. Simple work around to drag and drop. This mod requires adding 3 lines to the index.html file. It will work no matter the hostname/ip/port the web interface is served on. Remeber to change `app-<your-css-version>.css` and `app-<your-js-version>.js` to the correct file names on your device, Ex: app-90b703c8a29751ae81d5.css and app-9fb33d24a178758a2437.js. Picture below.
+Simple button that will open a file explorer window on your phone or computer and allow you to upload a file, for the ReMarkable Tablet's Web Interface. Simple work around to drag and drop. This mod requires adding 4 lines to the index.html file. Remeber to change `app-<your-css-version>.css` and `app-<your-js-version>.js` to the correct file names on your device, Ex: app-90b703c8a29751ae81d5.css and app-9fb33d24a178758a2437.js. Picture at bottom.
 
 
 ## Instructions
@@ -37,10 +37,10 @@ First, back the file up.
 Then, add the following lines of code underneath the `<body>` line and above the `<div id="root"></div>` line in index.html. Full code at bottom.
 
 ```
-<script type="text/javascript">
-    document.write('<div><form method=post enctype=multipart/form-data action='
-        + window.location.protocol + '//' + window.location.hostname + ":" + window.location.port + '/upload>' + '<input type=file name=file><input type=submit value=Upload></form><\div>');
-</script>
+<form method=post enctype=multipart/form-data action=upload>
+    <input type=file name=file>
+    <input type=submit value=Upload>
+</form>
 ```
 
 After saving, you should be able to reload the web page and see the upload button. If not, restore the backup:
@@ -95,10 +95,10 @@ If not, you will need to manually change this.
         <link href="/app-<your-css-version>.css" rel="stylesheet">
     </head>
     <body>
-        <script type="text/javascript">
-            document.write('<div><form method=post enctype=multipart/form-data action='
-                + window.location.protocol + '//' + window.location.hostname + ":" + window.location.port + '/upload>' + '<input type=file name=file><input type=submit value=Upload></form><\div>');
-        </script>
+        <form method=post enctype=multipart/form-data action=upload>
+            <input type=file name=file>
+            <input type=submit value=Upload>
+        </form>
         <div id="root"></div>
         <script type="text/javascript" src="/app-<your-js-version>.js"></script>
     </body>
