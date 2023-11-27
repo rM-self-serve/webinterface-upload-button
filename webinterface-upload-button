@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+# Copyright (c) 2023 rM-self-serve
+# SPDX-License-Identifier: MIT
+
+main() {
+	case "$@" in
+	'-h' | '--help' | '')
+		cli_info
+		;;
+	'apply')
+		apply
+		;;
+	'revert')
+		revert
+		;;
+	*)
+		echo 'input not recognized'
+		cli_info
+		;;
+	esac
+	true
+}
+
+cli_info() {
+	echo -e "${GREEN}webinterface-upload-button${NC}"
+	echo -e "${GREEN}webint-upldbtn${NC}"
+	echo ''
+	echo 'This program will add an upload button to the web interface.'
+	echo 'Included funtionality to revert modification.'
+	echo 'Source+Docs: https://github.com/rM-self-serve/webinterface-upload-button'
+	echo ''
+	echo -e "${CYAN}USAGE:${NC}"
+	echo '  webint-upldbtn [OPTIONS] [COMMANDS]'
+	echo ''
+	echo -e "${CYAN}COMMANDS:${NC}"
+	echo '  apply        Apply upload button modification'
+	echo '  revert       Revert upload button modification'
+	echo ''
+	echo -e "${CYAN}OPTIONS:${NC}"
+	echo '  -h, --help   Show help'
+}
+
+vars() {
+	webui_dir='/usr/share/remarkable/webui'
+	indx_file="${webui_dir}/index.html"
+	ndx_content=$(cat $indx_file)
+
+	body_line=$(echo "$ndx_content" | grep -n '<body>' | cut -d : -f 1)
+	root_line=$(echo "$ndx_content" | grep -n '<div id="root"></div>' | cut -d : -f 1)
+	total_line=$(echo "$ndx_content" | wc -l)
+
+	css_file="${webui_dir}/$(echo "$ndx_content" | grep -oE 'app-.+\.css')"
+	css_content=$(cat "$css_file")
+
+	unmod_css='.list{position:fixed;width:70%;top:70px;bottom:0;overflow-y:auto;max-width:700px}'
+	moded_css='.list{position:fixed;width:70%;top:94px;bottom:0;overflow-y:auto;max-width:700px}'
+
+	tmp_file="/tmp/webint-upldbtn.tmp.index.html"
+}
+
+is_html_moded() {
+	if echo "$1" | grep -qhE "webint-upldbtn"; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+is_css_unmod() {
+	if echo "$1" | grep -qhE $unmod_css; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+is_css_moded() {
+	if echo "$1" | grep -qhE $moded_css; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+apply() {
+	vars
+
+	echo "Applying webint-upldbtn will edit:"
+	echo "/usr/share/remarkable/webui/index.html"
+	echo "/usr/share/remarkable/webui/app-*.css"
+	echo ""
+
+	read -r -p "Would you like to continue? [y/N] " response
+	case "$response" in
+	[yY][eE][sS] | [yY])
+		apply_index
+		apply_css
+		;;
+	*)
+		echo "Cancel"
+		;;
+	esac
+
+}
+
+apply_index() {
+	if ! [ $((body_line + 1)) -eq "$root_line" ]; then
+		if is_html_moded "$ndx_content"; then
+			echo "Html already modified"
+		else
+			echo "Html unrecognized"
+		fi
+		exit
+	fi
+
+	[[ -f $tmp_file ]] && rm "$tmp_file"
+	{
+		echo "$ndx_content" | sed -n 1,"$body_line"p
+		cat <<EOF
+
+    <!-- lines added by webint-upldbtn -->
+    <form method=post enctype=multipart/form-data action=upload>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    <!-- end webint-upldbtn -->
+
+EOF
+		echo "$ndx_content" | sed -n "$root_line","$total_line"p
+	} >"$tmp_file"
+
+	cp "$tmp_file" "$indx_file"
+	echo "Html modified"
+}
+
+revert() {
+	vars
+
+	read -r -p "Would you like to revert modification? [y/N] " response
+	case "$response" in
+	[yY][eE][sS] | [yY])
+		revert_index
+		revert_css
+		;;
+	*)
+		echo "Cancel"
+		;;
+	esac
+}
+
+revert_index() {
+	if [ $((body_line + 1)) -eq "$root_line" ]; then
+		echo "Html has not been modified"
+		exit
+	fi
+
+	[[ -f "$tmp_file" ]] && rm "$tmp_file"
+	{
+		sed -n 1,"$body_line"p "$indx_file"
+		sed -n "$root_line","$total_line"p "$indx_file"
+	} >"$tmp_file"
+	mv "$tmp_file" "$indx_file"
+	echo "Html reverted"
+
+}
+
+apply_css() {
+	if ! is_css_unmod "$css_content"; then
+		if is_css_moded "$css_content"; then
+			echo "Css has already been modified"
+		else
+			echo "Css is not recognized"
+		fi
+		exit 1
+	fi
+
+	sed -i \ "s/${unmod_css}/${moded_css}/g" "$css_file"
+	echo "Css modified"
+}
+
+revert_css() {
+	if ! is_css_moded "$css_content"; then
+		if is_css_unmod "$css_content"; then
+			echo "Css has not been modified"
+		else
+			echo "Css is not recognized"
+		fi
+		exit 1
+	fi
+
+	sed -i \ "s/${moded_css}/${unmod_css}/g" "$css_file"
+	echo "Css reverted"
+}
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+main "$@"

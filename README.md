@@ -1,10 +1,44 @@
 # Upload Button for Web Interface
-Simple button that will open a file explorer window on your phone or computer and allow you to upload a file, for the ReMarkable Tablet's Web Interface. Simple work around to drag and drop. This mod requires adding 4 lines to the index.html file. Remeber to change `app-<your-css-version>.css` and `app-<your-js-version>.js` to the correct file names on your device, Ex: app-90b703c8a29751ae81d5.css and app-9fb33d24a178758a2437.js. Picture at bottom.
+Simple program to add or remove button that will open a file explorer window on your phone or computer and allow you to upload a file, for the ReMarkable Tablet's Web Interface. Simple work around to drag and drop. 
+
+## Installation/Removal
+
+### Install
+
+```$ wget https://raw.githubusercontent.com/rM-self-serve/webinterface-upload-button/master/install-webint-upldbtn.sh && bash install-webint-upldbtn.sh```
+
+### Remove
+
+```$ wget https://raw.githubusercontent.com/rM-self-serve/webinterface-upload-button/master/remove-webint-upldbtn.sh && bash remove-webint-upldbtn.sh```
+
+## Usage
+
+Add the upload button to the web interface:
+
+`$ webint-upldbtn apply`
+
+Remove the upload button from the web interface:
+
+`$ webint-upldbtn revert`
+
+## Limitations
+
+- Without more advanced file upload handeling, you will be redirected to the response status of the file upload.
+
+- Only one file can be uploaded at a time.
+
+## Example
+
+![mobile_web_ui](https://github.com/rM-self-serve/webinterface-wifi/assets/122753594/981f3367-653e-40db-b389-703a046a4362)
+
+## How it works
+
+This mod adds 4 lines to the index.html file and changes one value in the app.css file.
 
 
-## Instructions
+## Manual installation instructions
 
-All the following commands will be performed after ssh-ing into your ReMarkable Tablet.
+All the following commands will be performed after ssh-ing into your ReMarkable Tablet. Remeber to change `app-<your-css-version>.css` and `app-<your-js-version>.js` to the correct file names on your device, Ex: app-90b703c8a29751ae81d5.css and app-9fb33d24a178758a2437.js.
 
 Navigate to the webui directory
 
@@ -72,15 +106,6 @@ If so, the following command will change top to 94px.
 
 If not, you will need to manually change this.
 
-## Limitations
-
-- Without more advanced file upload handeling, you will be redirected to the response status of the file upload.
-
-- Only one file can be uploaded at a time.
-
-## Example
-
-![mobile_web_ui](https://user-images.githubusercontent.com/122753594/213054617-a4f68efe-08a5-4c45-a866-6103e3e144fd.jpg)
 
 ## Full index.html 
 
@@ -95,10 +120,14 @@ If not, you will need to manually change this.
         <link href="/app-<your-css-version>.css" rel="stylesheet">
     </head>
     <body>
-        <form method=post enctype=multipart/form-data action=upload>
-            <input type=file name=file>
-            <input type=submit value=Upload>
-        </form>
+
+		<!-- lines added by webint-upldbtn -->
+		<form method=post enctype=multipart/form-data action=upload>
+		  <input type=file name=file>
+		  <input type=submit value=Upload>
+		</form>
+		<!-- end webint-upldbtn -->
+
         <div id="root"></div>
         <script type="text/javascript" src="/app-<your-js-version>.js"></script>
     </body>
