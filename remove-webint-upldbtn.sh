@@ -12,7 +12,7 @@ echo 'Make sure to revert the modifications before uninstalling'
 read -r -p "Would you like to continue with removal? [y/N] " response
 case "$response" in
 [yY][eE][sS] | [yY])
-	echo "Removing webinterface-wifi"
+	echo "Removing webinterface-upload-button"
 	;;
 *)
 	echo "Exiting removal"
@@ -26,4 +26,4 @@ esac
 
 [[ -f $removefile ]] && rm $removefile
 
-echo "Successfully removed webinterface-wifi"
+echo "Successfully removed webinterface-upload-button"
