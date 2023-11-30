@@ -1,6 +1,10 @@
 # Upload Button for Web Interface
 Simple program to add or remove button that will open a file explorer window on your phone or computer and allow you to upload a file, for the ReMarkable Tablet's Web Interface. Simple work around to drag and drop. 
 
+## ReMarkable Software Version Compatibility
+
+- ✅ All Versions
+
 ## Installation/Removal
 
 ### Install

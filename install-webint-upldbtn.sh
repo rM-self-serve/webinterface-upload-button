@@ -2,9 +2,9 @@
 # Copyright (c) 2023 rM-self-serve
 # SPDX-License-Identifier: MIT
 
-upldbtn_sha256sum='03cddcba8bd40a4a7cc6bf8023488a27fe62530e8cba29d40f7dcbeb9c7ba988'
+upldbtn_sha256sum='38fd02d34289c102d71219b234a0ed2bdf8a79073b815585438cf3f4fb4b64f0'
 
-release='v1.0'
+release='v1.0.0'
 
 installfile='./install-webint-upldbtn.sh'
 pkgname='webinterface-upload-button'
