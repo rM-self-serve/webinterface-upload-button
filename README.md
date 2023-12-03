@@ -1,3 +1,7 @@
+![Static Badge](https://img.shields.io/badge/rMarkable-v3.8-green)
+![rM1: supported](https://img.shields.io/badge/rM1-supported-green)
+![rM2: supported](https://img.shields.io/badge/rM2-supported-green)
+
 # Upload Button for Web Interface
 Simple program to add or remove button that will open a file explorer window on your phone or computer and allow you to upload a file, for the ReMarkable Tablet's Web Interface. Simple work around to drag and drop. 
 
