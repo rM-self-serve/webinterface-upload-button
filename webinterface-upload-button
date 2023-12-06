@@ -5,28 +5,28 @@
 main() {
 	# collect options before or after command
 	no_prompt=false
-	if nop_match "$1"; then
-		no_prompt=true
-		shift
-	fi
-	cmd=("$1")
-	if [[ "$2" != "" ]]; then
-		shift
-		if [ "$no_prompt" == false ] && nop_match "$1"; then
+	cmd=()
+	for value in "$@"; do
+		case $value in
+		'-y' | '--no-prompt')
 			no_prompt=true
-			shift
-		fi
-		cmd+=("$@")
-	fi
+			;;
+		*)
+			cmd+=("$value")
+			;;
+		esac
+	done
 
 	case ${cmd[@]} in
 	'-h' | '--help' | '')
 		cli_info
 		;;
 	'apply')
+		checkspace
 		apply
 		;;
 	'revert')
+		checkspace
 		revert
 		;;
 	*)
@@ -37,8 +37,26 @@ main() {
 	true
 }
 
-nop_match() {
-	[[ "$1" == *"-y"* ]] || [[ "$1" == *"--no-prompt"* ]]
+checkspace() {
+	if ! _checkspace / 50; then
+		(
+			echo "Not enough space on /"
+			echo "Try to free space by running: journalctl --vacuum-time=1m"
+			exit 10
+		)
+		exit 1
+	fi
+}
+
+_checkspace() {
+	part=$1
+	needed=$2
+	_available=$(df "$part" | tail -n1 | awk '{print $4}')
+	available=$(("$_available"))
+	if [ $available -lt "$needed" ]; then
+		echo "Less than ${needed}K free, ${available}K"
+		return 1
+	fi
 }
 
 cli_info() {

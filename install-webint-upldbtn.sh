@@ -2,7 +2,7 @@
 # Copyright (c) 2023 rM-self-serve
 # SPDX-License-Identifier: MIT
 
-upldbtn_sha256sum='b60737106ae398feb2609e27a51ddbd531b45435567689337720f640ecd74bb7'
+upldbtn_sha256sum='4b1bcce62744cc4fbf77068cad689c2b7b40176e4b99017ac7daabe4eca77662'
 
 release='v1.0.0'
 
