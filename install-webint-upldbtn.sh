@@ -4,7 +4,7 @@
 
 upldbtn_sha256sum='4b1bcce62744cc4fbf77068cad689c2b7b40176e4b99017ac7daabe4eca77662'
 
-release='v1.0.0'
+release='v1.0.1'
 
 installfile='./install-webint-upldbtn.sh'
 pkgname='webinterface-upload-button'
