@@ -76,10 +76,18 @@ cli_info() {
 	echo '  -h, --help      Show help'
 }
 
+refresh_html() {
+	ndx_content=$(cat $index_file)
+}
+
+refresh_css() {
+	css_content=$(tr -d '\n' <"$css_file")
+}
+
 vars() {
 	webui_dir='/usr/share/remarkable/webui'
 	index_file="${webui_dir}/index.html"
-	ndx_content=$(cat $index_file)
+	refresh_html
 
 	no_wspc_html=$(
 		printf '
@@ -94,7 +102,7 @@ vars() {
 	sed_wspc_html=${no_wspc_html//[\/]/\\\/}
 
 	css_file="${webui_dir}/$(echo "$ndx_content" | xargs -n 1 | grep -oE 'app-.+\.css')"
-	css_content=$(tr -d '\n' <"$css_file")
+	refresh_css
 
 	unmod_css='.list{position:fixed;width:70%;top:70px;bottom:0'
 	moded_css='.list{position:fixed;width:70%;top:94px;bottom:0'
@@ -140,23 +148,11 @@ apply() {
 	echo ""
 	prompt
 
-	apply_index
-	apply_css
-}
-
-apply_index() {
-	if is_html_moded; then
-		echo "Html already modified"
-		return
+	apin=$(apply_index >&2)
+	apcs=$(apply_css >&2)
+	if [ "$apin" == false ] || [ "$apcs" == false ]; then
+		exit 1
 	fi
-	if ! can_mod_html; then
-		echo "Html unrecognized"
-		return
-	fi
-
-	sed -i "s/<body>/<body>$sed_wspc_html/" "$index_file"
-
-	echo "Html modified"
 }
 
 revert() {
@@ -168,47 +164,82 @@ revert() {
 	echo ""
 	prompt
 
-	revert_index
-	revert_css
+	rein=$(revert_index >&2)
+	recs=$(revert_css >&2)
+	if [ "$rein" == false ] || [ "$recs" == false ]; then
+		exit 1
+	fi
+}
+
+apply_index() {
+	if is_html_moded; then
+		echo "Html already modified"
+		return 0
+	fi
+	if ! can_mod_html; then
+		echo >&2 "Html unrecognized"
+		return 1
+	fi
+
+	sed -i "s/<body>/<body>$sed_wspc_html/" "$index_file"
+
+	refresh_html
+	if ! is_html_moded; then
+		echo >&2 "Error: Html not modified"
+		return 1
+	fi
+	echo "Html modified"
 }
 
 revert_index() {
-
 	if ! is_html_moded; then
 		echo "Html has not been modified"
-		return
+		return 0
 	fi
 
 	sed -i "s/$sed_wspc_html//g" "$index_file"
 
+	refresh_html
+	if is_html_moded; then
+		echo >&2 "Error: Html not reverted"
+		return 1
+	fi
 	echo "Html reverted"
 }
 
 apply_css() {
+	if is_css_moded; then
+		echo "Css already modified"
+		return 0
+	fi
 	if ! can_mod_css; then
-		if is_css_moded; then
-			echo "Css already modified"
-		else
-			echo "Css is not recognized"
-		fi
-		return
+		echo >&2 "Css is not recognized"
+		return 1
 	fi
 
 	sed -i "s/${unmod_css}/${moded_css}/" "$css_file"
+
+	refresh_css
+	if ! is_css_moded; then
+		echo >&2 "Error: Css not modified"
+		return 1
+	fi
 	echo "Css modified"
 }
 
 revert_css() {
 	if ! is_css_moded; then
-		if can_mod_css; then
-			echo "Css has not been modified"
-		else
-			echo "Css is not recognized"
-		fi
-		return
+		echo "Css has not been modified"
+		return 0
 	fi
 
-	sed -i \ "s/${moded_css}/${unmod_css}/" "$css_file"
+	sed -i "s/${moded_css}/${unmod_css}/" "$css_file"
+
+	refresh_css
+	if is_css_moded; then
+		echo >&2 "Error: Css not reverted"
+		return 1
+	fi
 	echo "Css reverted"
 }
 
