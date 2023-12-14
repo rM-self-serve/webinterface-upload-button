@@ -7,7 +7,7 @@ Add a button that will open a file explorer window on your phone or computer and
 
 ![demo](https://github.com/rM-self-serve/webinterface-upload-button/assets/122753594/609178f3-b6ae-4cb2-89cf-bfb77f639c7e)
 
-## Installation/Removal
+---
 
 ### Install
 
@@ -15,16 +15,8 @@ Add a button that will open a file explorer window on your phone or computer and
 
 ### Remove
 
-```$ wget https://raw.githubusercontent.com/rM-self-serve/webinterface-upload-button/master/remove-webint-upldbtn.sh && bash remove-webint-upldbtn.sh```
+```$ wget https://raw.githubusercontent.com/rM-self-serve/webinterface-upload-button/master/install-webint-upldbtn.sh && bash install-webint-upldbtn.sh remove```
 
-## Usage
-
-Add the upload button to the web interface:
-
-`$ webint-upldbtn apply`
-
-Remove the upload button from the web interface:
-
-`$ webint-upldbtn revert`
+---
 
 ![cli](https://github.com/rM-self-serve/webinterface-upload-button/assets/122753594/8206a208-9a04-47e7-a9c7-0565ed54a73a)
