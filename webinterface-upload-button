@@ -38,24 +38,17 @@ main() {
 }
 
 checkspace() {
-	if ! _checkspace / 50; then
+	needed=20
+	available=$(df '/' | tail -n1 | awk '{print $4}')
+	if [ "$available" -lt "$needed" ]; then
 		(
+			echo "Less than ${needed}K free, ${available}K"
 			echo "Not enough space on /"
 			echo "Try to free space by running: journalctl --vacuum-time=1m"
+			echo "Or: systemctl restart xochitl"
 			exit 10
-		)
-		exit 1
-	fi
-}
-
-_checkspace() {
-	part=$1
-	needed=$2
-	_available=$(df "$part" | tail -n1 | awk '{print $4}')
-	available=$(("$_available"))
-	if [ $available -lt "$needed" ]; then
-		echo "Less than ${needed}K free, ${available}K"
-		return 1
+		) >&2
+		exit 10
 	fi
 }
 
@@ -65,7 +58,7 @@ cli_info() {
 	echo 'Source+Docs: https://github.com/rM-self-serve/webinterface-upload-button'
 	echo ''
 	echo -e "${CYAN}USAGE:${NC}"
-	echo '  webint-upldbtn [OPTIONS] [COMMANDS]'
+	echo '  webinterface-upload-button [OPTIONS] [COMMANDS]'
 	echo ''
 	echo -e "${CYAN}COMMANDS:${NC}"
 	echo '  apply           Apply upload button modification'
@@ -80,48 +73,27 @@ refresh_html() {
 	ndx_content=$(cat $index_file)
 }
 
-refresh_css() {
-	css_content=$(tr -d '\n' <"$css_file")
-}
-
 vars() {
 	webui_dir='/usr/share/remarkable/webui'
 	index_file="${webui_dir}/index.html"
 	refresh_html
 
-	no_wspc_html=$(
+	no_ws_mod=$(
 		printf '
-		<!-- lines added by webint-upldbtn (cli will not recognize if edited) -->
-		<form method=post enctype=multipart/form-data action=upload>
-			<input type=file name=file>
-			<input type=submit value=Upload>
-		</form>
-		<!-- end webint-upldbtn -->' |
+		<!-- lines added by webinterface-upload-button (cli will not recognize if edited) -->
+		<script defer="defer" src="/webinterface-upload-button.js"></script>
+		<!-- end webinterface-upload-button -->' |
 			tr -d "\n" | tr -d "\t"
 	)
-	sed_wspc_html=${no_wspc_html//[\/]/\\\/}
-
-	css_file="${webui_dir}/$(echo "$ndx_content" | xargs -n 1 | grep -oE 'app-.+\.css')"
-	refresh_css
-
-	unmod_css='.list{position:fixed;width:70%;top:70px;bottom:0'
-	moded_css='.list{position:fixed;width:70%;top:94px;bottom:0'
+	sed_no_ws_mod=${no_ws_mod//[\/]/\\\/}
 }
 
 is_html_moded() {
-	[[ "$ndx_content" == *"$no_wspc_html"* ]]
+	[[ "$ndx_content" == *"$no_ws_mod"* ]]
 }
 
 can_mod_html() {
-	echo "$ndx_content" | grep -qh '<body>'
-}
-
-is_css_moded() {
-	echo "$css_content" | grep -qh "$moded_css"
-}
-
-can_mod_css() {
-	echo "$css_content" | grep -qh "$unmod_css"
+	echo "$ndx_content" | grep -qh '</head>'
 }
 
 prompt() {
@@ -142,36 +114,6 @@ prompt() {
 apply() {
 	vars
 
-	echo "Applying webint-upldbtn will edit:"
-	echo "$index_file"
-	echo "$css_file"
-	echo ""
-	prompt
-
-	apin=$(apply_index >&2)
-	apcs=$(apply_css >&2)
-	if [ "$apin" == false ] || [ "$apcs" == false ]; then
-		exit 1
-	fi
-}
-
-revert() {
-	vars
-
-	echo "Reverting webint-upldbtn will edit:"
-	echo "$index_file"
-	echo "$css_file"
-	echo ""
-	prompt
-
-	rein=$(revert_index >&2)
-	recs=$(revert_css >&2)
-	if [ "$rein" == false ] || [ "$recs" == false ]; then
-		exit 1
-	fi
-}
-
-apply_index() {
 	if is_html_moded; then
 		echo "Html already modified"
 		return 0
@@ -181,8 +123,14 @@ apply_index() {
 		return 1
 	fi
 
-	sed -i "s/<body>/<body>$sed_wspc_html/" "$index_file"
+	echo "Applying webinterface-upload-button will edit:"
+	echo "$index_file"
+	echo ""
+	prompt
 
+	if ! apply_index; then
+		exit 1
+	fi
 	refresh_html
 	if ! is_html_moded; then
 		echo >&2 "Error: Html not modified"
@@ -191,13 +139,22 @@ apply_index() {
 	echo "Html modified"
 }
 
-revert_index() {
+revert() {
+	vars
+
 	if ! is_html_moded; then
 		echo "Html has not been modified"
 		return 0
 	fi
 
-	sed -i "s/$sed_wspc_html//g" "$index_file"
+	echo "Reverting webinterface-upload-button will edit:"
+	echo "$index_file"
+	echo ""
+	prompt
+
+	if ! revert_index; then
+		exit 1
+	fi
 
 	refresh_html
 	if is_html_moded; then
@@ -207,40 +164,12 @@ revert_index() {
 	echo "Html reverted"
 }
 
-apply_css() {
-	if is_css_moded; then
-		echo "Css already modified"
-		return 0
-	fi
-	if ! can_mod_css; then
-		echo >&2 "Css is not recognized"
-		return 1
-	fi
-
-	sed -i "s/${unmod_css}/${moded_css}/" "$css_file"
-
-	refresh_css
-	if ! is_css_moded; then
-		echo >&2 "Error: Css not modified"
-		return 1
-	fi
-	echo "Css modified"
+apply_index() {
+	sed -i "s/<\/head>/$sed_no_ws_mod<\/head>/" "$index_file"
 }
 
-revert_css() {
-	if ! is_css_moded; then
-		echo "Css has not been modified"
-		return 0
-	fi
-
-	sed -i "s/${moded_css}/${unmod_css}/" "$css_file"
-
-	refresh_css
-	if is_css_moded; then
-		echo >&2 "Error: Css not reverted"
-		return 1
-	fi
-	echo "Css reverted"
+revert_index() {
+	sed -i "s/$sed_no_ws_mod//g" "$index_file"
 }
 
 CYAN='\033[0;36m'
