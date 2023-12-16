@@ -1,0 +1,180 @@
+/* https://github.com/rM-self-serve/webinterface-upload-button */
+
+/* Override defined css classes */
+/* -------------------- */
+body div#root {
+    width: 100%;
+    height: 80%
+}
+
+.list {
+    position: fixed;
+    width: 70%;
+    top: 106px;
+    bottom: 0;
+    overflow-y: auto;
+    max-width: 700px
+}
+
+@media(max-width:640px) {
+    .list {
+        position: initial;
+        width: initial
+    }
+}
+
+/* -------------------- */
+
+.form_wrap {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+}
+
+.my_form {
+    width: 696px;
+    margin-left: 175px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border-bottom: 1px solid;
+    border-color: black;
+    padding: 0 0% 0 0%;
+    padding-bottom: 0.25%;
+}
+
+@media(max-width:1000px) {
+    .my_form {
+        margin-left: 0;
+        width: 100%;
+        padding: 0.25% 1% 0.25% 1%;
+    }
+}
+
+@media(max-width:640px) {
+    .my_form {
+        padding: 1% 1% 1% 1%;
+    }
+}
+
+.browbtn {
+    font-family: MaisonNeueBook;
+    font-size: 14px;
+    font-weight: 400;
+    flex: 2 1 auto;
+    background-color: transparent;
+}
+
+.upldbtn {
+    font-family: MaisonNeueBook;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 0.9%;
+    padding-bottom: 0.4%;
+    margin-top: 0.0%;
+}
+
+.spin_wrap {
+    position: fixed;
+    pointer-events: none;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 114px;
+}
+
+@media(max-width:1000px) {
+    .spin_wrap {
+        margin-left: 0;
+    }
+}
+
+.spinner {
+    width: 160px;
+    height: 160px;
+    border: 35px solid;
+    border-color: transparent;
+    border-radius: 50%;
+}
+
+.spin_action {
+    animation: spin 2.5s linear infinite;
+    animation-delay: 0s;
+}
+
+.spin_action_fast {
+    animation: spin 1.0s linear infinite;
+    animation-delay: 0s;
+}
+
+.fadei_action {
+    animation: myfadeIn 0.5s ease-in-out infinite;
+    animation-delay: 0s;
+}
+
+.fadeo_action {
+    animation: myfadeOut 1.0s ease-in-out infinite;
+    animation-delay: 0s;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        border-width: 80px;
+        border-radius: 20%;
+    }
+
+    75% {
+        border-width: 35px;
+        border-radius: 50%;
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes myfadeOut {
+    0% {
+        opacity: 1;
+        border-color: #7BC342;
+    }
+
+    50% {
+        border-width: 80px;
+    }
+
+    100% {
+        opacity: 0;
+        border-color: transparent;
+        border-width: 80px;
+    }
+}
+
+@keyframes myfadeIn {
+    0% {
+        border-color: #7BC342;
+        border-width: 80px;
+        opacity: 0;
+    }
+
+    25% {
+        border-width: 80px;
+    }
+
+    100% {
+        opacity: 1;
+        border-width: 35px;
+    }
+}
