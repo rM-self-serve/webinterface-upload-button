@@ -13,6 +13,8 @@ Add a button that will open a file explorer window on your phone or computer and
 
 ```$ wget https://raw.githubusercontent.com/rM-self-serve/webinterface-upload-button/master/install-webint-upldbtn.sh && bash install-webint-upldbtn.sh```
 
+Then open http://10.11.99.1/
+
 ### Remove
 
 ```$ wget https://raw.githubusercontent.com/rM-self-serve/webinterface-upload-button/master/install-webint-upldbtn.sh && bash install-webint-upldbtn.sh remove```

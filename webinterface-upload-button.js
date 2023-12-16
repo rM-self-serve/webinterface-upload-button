@@ -1,6 +1,5 @@
 // https://github.com/rM-self-serve/webinterface-upload-button
 
-let global_is_uploading = false;
 
 function init() {
     var css = `.header-button-ovrd { 
@@ -37,11 +36,12 @@ function init() {
     upbtn_node.addEventListener("click", handleSubmit);
 }
 
+let global_is_uploading = false;
+
 async function handleSubmit(_) {
     if (global_is_uploading) {
         return;
     }
-    global_is_uploading = true;
     let input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
@@ -51,6 +51,7 @@ async function handleSubmit(_) {
 }
 
 async function input_auto_submit(input) {
+    global_is_uploading = true;
     let list_elm = document.getElementsByClassName('list')[0];
     let list_ref = list_elm.removeChild(list_elm.childNodes[1]);
     let loaderNode = document.createElement("div");
@@ -95,7 +96,6 @@ async function input_auto_submit(input) {
     list_elm.removeChild(loader_ref)
     list_elm.appendChild(list_ref)
 }
-
 
 function create_list_entry(file_name) {
     const outer_div = document.createElement('div');
