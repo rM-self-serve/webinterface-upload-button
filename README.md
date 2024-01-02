@@ -7,7 +7,20 @@ Add a button that will open a file explorer window on your phone or computer and
 
 ![demo](https://github.com/rM-self-serve/webinterface-upload-button/assets/122753594/609178f3-b6ae-4cb2-89cf-bfb77f639c7e)
 
----
+
+## Install
+
+**It is recommended to install via the [toltec package manager](https://toltec-dev.org/).**
+
+### With toltec
+
+```
+$ opkg update
+$ opkg install webinterface-upload-button
+$ opkg remove webinterface-upload-button
+```
+
+### No toltec
 
 ### Install
 
