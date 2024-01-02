@@ -14,6 +14,10 @@ binfile="$localbin/$pkgname"
 jsname="$pkgname.js"
 jsfile="/usr/share/remarkable/webui/$jsname"
 
+wget_path=/home/root/.local/share/rM-self-serve/wget
+wget_remote=http://toltec-dev.org/thirdparty/bin/wget-v1.21.1-1
+wget_checksum=c258140f059d16d24503c62c1fdf747ca843fe4ba8fcd464a6e6bda8c3bbb6b5
+
 main() {
 	case "$@" in
 	'install' | '')
@@ -60,6 +64,25 @@ sha_fail() {
 	remove_install_script
 	exit
 }
+install_wget() {
+	if [ -f "$wget_path" ] && ! sha256sum -c <(echo "$wget_checksum  $wget_path") > /dev/null 2>&1; then
+	    rm "$wget_path"
+	fi
+	if ! [ -f "$wget_path" ]; then
+	    echo "Fetching secure wget"
+	    # Download and compare to hash
+	    mkdir -p "$(dirname "$wget_path")"
+	    if ! wget -q "$wget_remote" --output-document "$wget_path"; then
+		echo "Error: Could not fetch wget, make sure you have a stable Wi-Fi connection"
+		exit 1
+	    fi
+	fi
+	if ! sha256sum -c <(echo "$wget_checksum  $wget_path") > /dev/null 2>&1; then
+	    echo "Error: Invalid checksum for the local wget binary"
+	    exit 1
+	fi
+	chmod 755 "$wget_path"
+}
 
 install() {
 	echo "${pkgname} ${release}"
@@ -70,6 +93,7 @@ install() {
 	echo "${localbin} will be added to the path in ~/.bashrc if necessary"
 	echo ''
 
+	install_wget
 	mkdir -p $localbin
 	case :$PATH: in
 	*:$localbin:*) ;;
@@ -77,7 +101,7 @@ install() {
 	esac
 
 	[[ -f $binfile ]] && revert_mod && remove_install_files 
-	wget "https://github.com/rM-self-serve/${pkgname}/releases/download/${release}/${pkgname}" \
+	"$wget_path" "https://github.com/rM-self-serve/${pkgname}/releases/download/${release}/${pkgname}" \
 		-O "$binfile"
 	if ! sha_check "$upldbtn_sha256sum" "$binfile"; then
 		sha_fail
@@ -85,7 +109,7 @@ install() {
 	chmod +x $binfile
 
 	[[ -f $jsfile ]] && rm $jsfile
-	wget "https://github.com/rM-self-serve/${pkgname}/releases/download/${release}/${jsname}" \
+	"$wget_path" "https://github.com/rM-self-serve/${pkgname}/releases/download/${release}/${jsname}" \
 		-O "$jsfile"
 	if ! sha_check "$js_sha256sum" "$jsfile"; then
 		sha_fail
