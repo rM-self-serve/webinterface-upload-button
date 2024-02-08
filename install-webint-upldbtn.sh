@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 upldbtn_sha256sum='c2c873b0a4859e2fd038ed9fb9889ca0c70ec530dda33c00adb17c00312d2fd7'
-js_sha256sum='d95e332f64bf9e5a3bd77f31845657fdbc15e3edce52b33de1ccee88845d3c47'
+js_sha256sum='c632e8095b9640bc76c4219de987415aba183f3ceb5c23321578459d8d6ef8b5'
 
-release='v1.1.1'
+release='v1.1.2'
 
 installfile='./install-webint-upldbtn.sh'
 pkgname='webinterface-upload-button'

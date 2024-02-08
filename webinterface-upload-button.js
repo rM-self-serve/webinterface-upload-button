@@ -1,7 +1,17 @@
 // https://github.com/rM-self-serve/webinterface-upload-button
 
+async function wait4header() {
+    for (let i=0; i<20; i++) {
+        const hgroups = document.getElementsByClassName('header-group');
+        if (hgroups.length > 1) {
+            return hgroups; 
+        }
+        await new Promise(r => setTimeout(r, 100))
+    }
+    return null;
+}
 
-function init() {
+async function init() {
     var css = `.header-button-ovrd { 
         background-color: transparent;
     };`;
@@ -12,8 +22,8 @@ function init() {
         style.appendChild(document.createTextNode(css));
     }
     document.getElementsByTagName('head')[0].appendChild(style);
-
-    const hgroups = document.getElementsByClassName('header-group');
+    
+    const hgroups = await wait4header();
     const my_files_box = hgroups[0];
     my_files_box.style.flex = "10 1 auto";
 
