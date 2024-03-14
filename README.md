@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/reMarkable-v3.9.4-green)
+![Static Badge](https://img.shields.io/badge/reMarkable-v3.10.2-green)
 [![rm1](https://img.shields.io/badge/rM1-supported-green)](https://remarkable.com/store/remarkable)
 [![rm2](https://img.shields.io/badge/rM2-supported-green)](https://remarkable.com/store/remarkable-2)
 [![opkg](https://img.shields.io/badge/OPKG-webinterface--upload--button-blue)](https://toltec-dev.org/)
