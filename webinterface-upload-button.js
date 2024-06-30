@@ -1,14 +1,16 @@
 // https://github.com/rM-self-serve/webinterface-upload-button
 
 async function wait4header() {
-    for (let i=0; i<20; i++) {
-        const hgroups = document.getElementsByClassName('header-group');
-        if (hgroups.length > 1) {
-            return hgroups; 
-        }
-        await new Promise(r => setTimeout(r, 100))
-    }
-    return null;
+    return new Promise((resolve) => {
+        const callback = (_mutationList) => {
+            if (document.getElementsByClassName("header-group").length >= 2) {
+                observer.disconnect();
+                resolve();
+            }
+        };
+        const observer = new MutationObserver(callback);
+        observer.observe(document.body, { childList: true, subtree: true });
+    });
 }
 
 async function init() {
@@ -33,8 +35,16 @@ async function init() {
     let upbtn_node = document.createElement("a");
     upbtn_node.role = "button";
     upbtn_node.id = "upbtn";
-    upbtn_node.className = hbtn_elm.classList[0];
-    upbtn_node.appendChild(hbtn_elm.firstChild.cloneNode(true));
+    upbtn_node.className = hbtn_elm ? hbtn_elm.classList[0] : "header-button";
+    if (hbtn_elm) {
+        upbtn_node.appendChild(hbtn_elm.firstChild.cloneNode(true));
+    } else {
+        const i = document.createElement("i");
+        i.className = "icon-rm_ikoner_final_action_download-98";
+        const div = document.createElement("div");
+        div.appendChild(i);
+        upbtn_node.appendChild(div);
+    }
     upbtn_node.classList.add("header-button-ovrd")
     upbtn_node.style.borderWidth = "0px 0px 0px 1px";
 
