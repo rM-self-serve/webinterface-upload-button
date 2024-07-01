@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 main() {
+	inapplicable_version_exit
 	# collect options before or after command
 	no_prompt=false
 	cmd=()
@@ -37,6 +38,22 @@ main() {
 	true
 }
 
+inapplicable_version_exit() {
+	conf_file='/usr/share/remarkable/update.conf'
+	if ! [ -f $conf_file ]; then
+		echo >&2 "Error: Can't find ${conf_file}"
+		exit 1
+	fi
+	xo_version=$(grep 'REMARKABLE_RELEASE_VERSION' $conf_file | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
+	IFS=. read -r versA versB _ _ <<<"$xo_version"
+
+	if [ "$versA" -eq 3 ] && [ "$versB" -ge 12 ] || [ "$versA" -ge 4 ]; then
+		echo 'webinterface-upload-button is no longer necessary as of v3.12,'
+		echo 'please uninstall.'
+		exit
+	fi
+}
+
 checkspace() {
 	needed=20
 	available=$(df '/' | tail -n1 | awk '{print $4}')
@@ -68,6 +85,8 @@ cli_info() {
 	echo '  -y, --no-promt  Do not show confirmation prompt'
 	echo '  -h, --help      Show help'
 }
+
+
 
 refresh_html() {
 	ndx_content=$(cat $index_file)
