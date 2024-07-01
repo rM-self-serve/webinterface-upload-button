@@ -1,20 +1,13 @@
 // https://github.com/rM-self-serve/webinterface-upload-button
 
-async function wait4header() {
-    return new Promise((resolve) => {
-        const callback = (_mutationList) => {
-            if (document.getElementsByClassName("header-group").length >= 2) {
-                observer.disconnect();
-                resolve();
-            }
-        };
-        const observer = new MutationObserver(callback);
-        observer.observe(document.body, { childList: true, subtree: true });
-    });
-}
 
-async function init() {
-    var css = `.header-button-ovrd { 
+(function() {
+    'use strict';
+
+let global_is_uploading = false;
+
+function init() {
+    var css = `.header-button-ovrd {
         background-color: transparent;
     };`;
     var style = document.createElement('style');
@@ -24,8 +17,8 @@ async function init() {
         style.appendChild(document.createTextNode(css));
     }
     document.getElementsByTagName('head')[0].appendChild(style);
-    
-    const hgroups = await wait4header();
+
+    const hgroups = document.getElementsByClassName('header-group');
     const my_files_box = hgroups[0];
     my_files_box.style.flex = "10 1 auto";
 
@@ -50,18 +43,16 @@ async function init() {
 
     let icon_elm = upbtn_node.firstChild.firstChild;
     icon_elm.style.transform = "rotate(180deg)";
-
     btns_elm.insertBefore(upbtn_node, hbtn_elm);
 
     upbtn_node.addEventListener("click", handleSubmit);
 }
 
-let global_is_uploading = false;
-
 async function handleSubmit(_) {
     if (global_is_uploading) {
         return;
     }
+    global_is_uploading = true;
     let input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
@@ -71,7 +62,6 @@ async function handleSubmit(_) {
 }
 
 async function input_auto_submit(input) {
-    global_is_uploading = true;
     let list_elm = document.getElementsByClassName('list')[0];
     let list_ref = list_elm.removeChild(list_elm.childNodes[1]);
     let loaderNode = document.createElement("div");
@@ -161,5 +151,13 @@ function create_list_entry(file_name) {
     return outer_div;
 }
 
+const callback = _ => {
+  if (document.getElementsByClassName("header-group").length >= 2) {
+      observer.disconnect();
+      init();
+  }
+};
 
-init()
+const observer = new MutationObserver(callback);
+observer.observe(document.body, {childList: true, subtree: true});
+})();
